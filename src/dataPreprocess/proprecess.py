@@ -25,10 +25,33 @@ def proprecess(jsonfile):
 def readcsv(filename):
     with open('../../dataset/aiv.csv','r') as f:
         dict_reader = csv.DictReader(f)
+        count = 0
         for row in dict_reader:
+            count += 1
+            if count > 100:
+                break
             print(row['reviewerID'])
             print(row['overall'])
+            print(row['reviewText'])
 
+def simpleCount(filename):
+    with open('../../dataset/aiv.csv','r') as f:
+        dict_reader = csv.DictReader(f)
+        dict_reviewers={}
+        dict_reviews={}
+        for row in dict_reader:
+            if row['reviewerID'] not in dict_reviewers:
+                dict_reviewers[row['reviewerID']] = 1
+            else:
+                dict_reviewers[row['reviewerID']] += 1
 
-proprecess('../../dataset/reviews_Amazon_Instant_Video_5.json')
+            if row['asin'] not in dict_reviews:
+                dict_reviews[row['asin']] = 1
+            else:
+                dict_reviews[row['asin']] += 1
+
+        print('reviewers: ',dict_reviewers.__len__())
+        print('asins: ',dict_reviews.__len__())
+# proprecess('../../dataset/reviews_Amazon_Instant_Video_5.json')
 # readcsv('../../dataset/aiv.csv')
+simpleCount('../../dataset/aiv.csv')
