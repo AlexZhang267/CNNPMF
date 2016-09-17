@@ -1,2 +1,5 @@
 .DS_Store
 .idea
+reviews_Amazon_Instant_Video.json
+reviews_Amazon_Instant_Video.json.gz
+*.csv
