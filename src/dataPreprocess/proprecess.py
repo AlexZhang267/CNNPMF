@@ -1,6 +1,8 @@
 #coding=utf-8
 import csv
 import json
+import sys
+csv.field_size_limit(sys.maxsize)
 def proprecess(jsonfile):
     file = open(jsonfile,'r')
     count = 0
@@ -55,10 +57,13 @@ def simpleCount(filename):
         print('asins: ',dict_reviews.__len__())
 
 
-def removeStopWords(csvfilw):
+def combine(csvfilw):
     f = open(csvfilw,'r')
     dict_reader = csv.DictReader(f)
     count = 0
+
+
+
     with open('../../dataset/aiv_all_removed_stop_words.csv','a') as wf:
         asin_dict={}
         for row in dict_reader:
@@ -82,8 +87,34 @@ def removeStopWords(csvfilw):
 def removePunctuation(document):
     return document.replace(',','').replace('.','').replace(':','').replace(';','').replace('(','').replace(')','').replace('"','').replace('!','').replace('?','').lower()
 
-# proprecess('../../dataset/reviews_Amazon_Instant_Video.json')
-readcsv('../../dataset/aiv_all_removed_stop_words.csv')
-# simpleCount('../../dataset/aiv.csv')
 
+def removeStopWords():
+    f2 = open('../../dataset/stopwords.txt', 'r')
+    stopwords = []
+    for line in f2:
+        stopwords.append(' '+line.strip()+' ')
+
+    dict_reader = csv.DictReader(open('../../dataset/aiv_all_removed_stop_words.csv','r'))
+    count = 0
+    with open('../../dataset/aiv_clean.csv','a') as wf:
+        writer = csv.writer(wf)
+        writer.writerow(['asin','reviewText'])
+        for row in dict_reader:
+            # count += 1
+            # if count > 10:
+            #     break
+            # print row['asin'], row['reviewText']
+            for s in stopwords:
+                row['reviewText'] = row['reviewText'].replace(s,' ')
+            # print row['asin'],row['reviewText']
+            l=[]
+            l.append(row['asin'])
+            l.append(row['reviewText'])
+            writer.writerow(l)
+
+
+# proprecess('../../dataset/reviews_Amazon_Instant_Video.json')
+readcsv('../../dataset/aiv_clean.csv')
+# simpleCount('../../dataset/aiv.csv')
 # removeStopWords('../../dataset/aiv_all.csv')
+# removeStopWords()
