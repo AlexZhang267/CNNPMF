@@ -1,0 +1,6 @@
+aiv.csv :5 core 的json
+aiv_all.csv :所有的review的json文件
+aiv_all_removed_stop_words.csv: aiv_all.csv 移除标点符号的之后
+aiv_clean.csv: aiv_all_removed_stop_words.csv 移除stopwords.txt中stopword之后的
+aiv_combine_5.csv   : 5 core移除标点并按照asin合并之后的文件
+aiv_removed_stop_words_5    :aiv_combine_5.csv 移除stopwords之后的文件

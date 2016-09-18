@@ -37,8 +37,8 @@ def readcsv(filename):
             print(row['asin'])
             print(row['reviewText'])
 
-def simpleCount(filename):
-    with open('../../dataset/aiv.csv','r') as f:
+def simpleCount():
+    with open('../../dataset/aiv_ratings_5core.csv','r') as f:
         dict_reader = csv.DictReader(f)
         dict_reviewers={}
         dict_reviews={}
@@ -64,7 +64,7 @@ def combine(csvfilw):
 
 
 
-    with open('../../dataset/aiv_all_removed_stop_words.csv','a') as wf:
+    with open('../../dataset/aiv_combine_5.csv','a') as wf:
         asin_dict={}
         for row in dict_reader:
             count += 1
@@ -94,9 +94,9 @@ def removeStopWords():
     for line in f2:
         stopwords.append(' '+line.strip()+' ')
 
-    dict_reader = csv.DictReader(open('../../dataset/aiv_all_removed_stop_words.csv','r'))
+    dict_reader = csv.DictReader(open('../../dataset/aiv_combine_5.csv','r'))
     count = 0
-    with open('../../dataset/aiv_clean.csv','a') as wf:
+    with open('../../dataset/aiv_removed_stop_words_5.csv','a') as wf:
         writer = csv.writer(wf)
         writer.writerow(['asin','reviewText'])
         for row in dict_reader:
@@ -113,8 +113,25 @@ def removeStopWords():
             writer.writerow(l)
 
 
-# proprecess('../../dataset/reviews_Amazon_Instant_Video.json')
-readcsv('../../dataset/aiv_clean.csv')
-# simpleCount('../../dataset/aiv.csv')
-# removeStopWords('../../dataset/aiv_all.csv')
-# removeStopWords()
+
+def storeRating():
+    with open('../../dataset/aiv_ratings_5core.csv','a') as wf:
+        writer=csv.writer(wf)
+        writer.writerow(['reviewerID','asin','overall'])
+        reader_dict = csv.DictReader(open('../../dataset/aiv.csv','r'))
+        for row in reader_dict:
+            l=[]
+            l.append(row['reviewerID'])
+            l.append(row['asin'])
+            l.append(row['overall'])
+            writer.writerow(l)
+
+
+if __name__=='__main__':
+    # proprecess('../../dataset/reviews_Amazon_Instant_Video.json')
+    # readcsv('../../dataset/aiv_data_5core.csv')
+    # storeRating()
+    simpleCount()
+    # combine('../../dataset/aiv.csv')
+    # removeStopWords('../../dataset/aiv_all.csv')
+    # removeStopWords()
