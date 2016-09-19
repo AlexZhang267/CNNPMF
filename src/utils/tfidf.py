@@ -109,7 +109,7 @@ def proprecess():
         # writer.writerow(list(d) for d in dict)
 
     count = 0
-    with open('../../dataset/aiv_data_5core.csv','a') as wf:
+    with open('../../dataset/aiv_data_5core_length_50.csv','a') as wf:
         writer = csv.writer(wf)
         writer.writerow(['asin','reviewText'])
         for doc in tfidf.documents:
@@ -120,9 +120,14 @@ def proprecess():
             cleanReviewText = []
             cleanReviewText.append(doc[0])
             words=''
+            count = 0
             for word in reviewWordList:
                 if word in top8000_tfidf_dict and tfidf.word_df_dict.get(word,0)<0.5:
+                    count += 1
+                    if count > 50:
+                        break
                     words+=word+' '
+
             cleanReviewText.append(words)
             # print cleanReviewText
             writer.writerow(cleanReviewText)

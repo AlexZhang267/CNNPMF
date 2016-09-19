@@ -2,6 +2,10 @@
 import csv
 import json
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
 csv.field_size_limit(sys.maxsize)
 def proprecess(jsonfile):
     file = open(jsonfile,'r')
@@ -56,6 +60,19 @@ def simpleCount():
         print('reviewers: ',dict_reviewers.__len__())
         print('asins: ',dict_reviews.__len__())
 
+def countLens():
+    dict_reader = csv.DictReader(open('../../dataset/aiv_data_5core_length_50.csv','r'))
+    lenList=[]
+    for row in dict_reader:
+        lenList.append(len(row['reviewText'].split()))
+
+    lenList = np.asarray(lenList)
+    max = np.max(lenList)
+    min = np.min(lenList)
+
+    fig,ax = plt.subplots()
+    ax.hist(lenList,max-min+1)
+    plt.show()
 
 def combine(csvfilw):
     f = open(csvfilw,'r')
@@ -126,12 +143,107 @@ def storeRating():
             l.append(row['overall'])
             writer.writerow(l)
 
+def buildCorpus():
+    s = ""
+    reader_dict = csv.DictReader(open('../../dataset/aiv.csv','r'))
+    for row in reader_dict:
+        s += removePunctuation(row['reviewText'])+' '
+
+    with open('../../dataset/corpus_5core.csv','a') as wf:
+        print len(s)
+        wf.write(s)
+
+def buildTopWordsVectors5core():
+    dict_reader = csv.DictReader(open('../../dataset/top_8000_words_5.csv','r'))
+    fin = open('../../dataset/vectors.txt','r')
+    vectors_dict={}
+    for line in fin:
+        tmp = line.split(' ',1)
+        vectors_dict[tmp[0]] = tmp[1].replace("\r\n",'').replace('\n','')
+    with open('../../dataset/top_8000_words_vectors_5core.csv','a') as wf:
+        writer = csv.writer(wf)
+        writer.writerow(['word','vector'])
+        for row in dict_reader:
+            if row['word'] in vectors_dict:
+                writer.writerow([row['word'],vectors_dict[row['word']]])
+    fin.close()
+
+def buildTopWordsVectors5coreWithInitialize():
+    dict_reader = csv.DictReader(open('../../dataset/top_8000_words_5.csv','r'))
+    fin = open('../../dataset/vectors.txt','r')
+    vectors_dict={}
+    for line in fin:
+        tmp = line.split(' ',1)
+        vectors_dict[tmp[0]] = tmp[1].replace("\r\n",'').replace('\n','')
+    with open('../../dataset/top_8000_words_vectors_5core_with_initialization.csv','a') as wf:
+        writer = csv.writer(wf)
+        writer.writerow(['word','vector'])
+        for row in dict_reader:
+            if row['word'] in vectors_dict:
+                writer.writerow([row['word'],vectors_dict[row['word']]])
+            else:
+                writer.writerow([row['word'],str(np.random.uniform(-0.5,0.5,50)).replace('\r\n','').replace('\n','').replace('[','').replace(']','')])
+    fin.close()
+
+
+
+def generateData():
+    fin = open('../../dataset/aiv_ratings_5core.csv','r')
+    reviewerNum = 0
+    asinNum = 0
+    reviewerDict={}
+    ratingList=[]
+    asinDict={}
+    reader_dict = csv.DictReader(fin)
+
+    for row in reader_dict:
+        if row['reviewerID'] not in reviewerDict:
+            reviewerDict[row['reviewerID']] = reviewerNum
+            reviewerNum+=1
+
+        if row['asin'] not in asinDict:
+            asinDict[row['asin']] = asinNum
+            asinNum+=1
+
+        tmp=''
+        tmp += str(reviewerDict[row['reviewerID']])+" "
+        tmp += str(asinDict[row['asin']])+" "
+        tmp += str(row['overall'])
+        ratingList.append(tmp)
+
+    random.shuffle(ratingList)
+    length = len(ratingList)
+    flag = int(length*0.8)
+    trainData = ratingList[:flag]
+    validationData = ratingList[flag:]
+
+    # print (trainData)
+    # print(validationData)
+
+    trainWriter = csv.writer(open('../../dataset/train_data.csv','a'))
+    validationWriter = csv.writer(open('../../dataset/validation_data.csv','a'))
+    for d in trainData:
+        trainWriter.writerow(d.split())
+    for dd in validationData:
+        validationWriter.writerow(dd.split())
+
+
+
+
+
+
+
+
 
 if __name__=='__main__':
     # proprecess('../../dataset/reviews_Amazon_Instant_Video.json')
     # readcsv('../../dataset/aiv_data_5core.csv')
     # storeRating()
-    simpleCount()
+    # simpleCount()
+    # countLens()
+    # buildCorpus()
+    # buildTopWordsVectors5coreWithInitialize()
+    generateData()
     # combine('../../dataset/aiv.csv')
     # removeStopWords('../../dataset/aiv_all.csv')
     # removeStopWords()
